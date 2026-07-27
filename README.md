@@ -42,8 +42,8 @@ signature schemes as they become available.
 
 | Stage | | |
 |---|---|---|
-| 0 | vanilla build + spec reading | in progress |
-| 1 | consensus rules | - |
+| 0 | vanilla build + spec reading | done |
+| 1 | consensus rules | done |
 | 2 | official test vectors | - |
 | 3 | address / solver | - |
 | 4 | RPC wallet + functional test | - |

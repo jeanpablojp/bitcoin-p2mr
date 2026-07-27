@@ -69,6 +69,23 @@ as 0xc1). They are construction-only vectors: no spending
 transactions or signatures, unlike BIP 341's script-path spend
 vectors. Spend-path testing is entirely on us (see FINDINGS).
 
+## Implementation notes (stage 1)
+
+- The consensus delta is not limited to VerifyWitnessProgram():
+  PrecomputedTransactionData::Init() decides whether to precompute the
+  BIP 341 sighash midstate by pattern-matching spent outputs (34 bytes
+  starting with OP_1). A P2MR output (OP_2) wasn't matched, so
+  m_bip341_taproot_ready stayed false and every signed P2MR spend
+  failed sighash computation. Caught by the first unit test; fixed by
+  matching OP_2/34-byte outputs the same way. Worth flagging in the
+  write-up: any implementation that only patches the interpreter will
+  appear to work until it verifies a real signature.
+- Two vanilla functional tests assumed v2/32-byte programs are
+  unencumbered (feature_taproot "applic" cases, p2p_segwit
+  test_segwit_versions). Adapted them following the upstream v1
+  precedent (33-byte program or skip). Expected collateral of any new
+  witness version taking effect.
+
 ## Build log (stage 0)
 
 Done 2026-07-27.
