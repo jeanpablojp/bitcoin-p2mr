@@ -63,6 +63,38 @@ max-depth path, P2SH-wrapped v2, non-32-byte v2 programs, empty
 control block -- covered now. The mempool flag scope question is
 written up in NOTES.md.
 
+## 2026-07-27, stage 2: official vectors against the implementation
+
+Harness in src/test/p2mr_vector_tests.cpp, consuming the pinned JSONs.
+Result: all 9 vectors in p2mr_construction.json pass every check (leaf
+hashes, merkle root, scriptPubKey, bc1z address, control blocks, and a
+consensus cross-check walking each control block through
+ComputeP2MRMerkleRoot). The pqc file has two real bugs, confirmed with
+an independent Python recomputation straight from the spec formulas:
+
+- p2mr_pqc_construction.json, p2mr_three_leaf_complex and
+  p2mr_three_leaf_alternative: intermediary.leafHashes[0] and [2] are
+  swapped. The values are correct, the order is not; the same trees in
+  p2mr_construction.json list them in depth-first order. Looks like a
+  sibling of the control-block ordering bug fixed in bips PR #2202 --
+  the fix didn't reach the pqc file's leafHashes.
+- p2mr_pqc_construction.json, p2mr_different_version_leaves: the
+  control block for the leaf with leafVersion 0xfa starts with byte
+  0xc1; by the spec's own control byte rules it must be 0xfb (leaf
+  version with the low bit set). The path bytes and the vector's
+  merkle root are otherwise consistent with the 0xfa leaf, so the
+  published control block cannot satisfy validation as printed.
+
+Both fixed and submitted upstream as bitcoin/bips#2220 (the repo has
+issues disabled, so straight to a PR -- same route as the earlier
+vector fix #2102). The doc-side problems (stale links, version
+header, "(empty)" label) went in bitcoin/bips#2221, which also notes
+the schema inconsistencies (scriptTree/script_tree, null vs empty
+string for a missing tree) for the maintainers to decide on. The
+harness keeps documented exceptions for the two vector bugs that
+assert the divergence still reproduces at the pinned commit, so the
+upstream fix landing flips the test and tells us to drop them.
+
 ## Measurements
 
 Stage 4: witness weight and vsize, 2-leaf vs deeper trees, compared
