@@ -75,8 +75,8 @@ an independent Python recomputation straight from the spec formulas:
 - p2mr_pqc_construction.json, p2mr_three_leaf_complex and
   p2mr_three_leaf_alternative: intermediary.leafHashes[0] and [2] are
   swapped. The values are correct, the order is not; the same trees in
-  p2mr_construction.json list them in depth-first order. Looks like a
-  sibling of the control-block ordering bug fixed in bips PR #2202 --
+  p2mr_construction.json list them in depth-first order. Looks like the
+  same kind of mistake as the control-block ordering bug fixed in bips PR #2202 --
   the fix didn't reach the pqc file's leafHashes.
 - p2mr_pqc_construction.json, p2mr_different_version_leaves: the
   control block for the leaf with leafVersion 0xfa starts with byte

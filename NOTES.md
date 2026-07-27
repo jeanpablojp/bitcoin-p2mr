@@ -5,7 +5,7 @@ bip-0360.mediawiki at commit
 0fdf6ffdbb394a73c80978ae647322ceda8b9337 (header v0.12.0, changelog
 0.12.1). Sections cited by name.
 
-Q1. Control block first byte. Answered. Leaf version is
+Q1. Control block first byte. Leaf version is
 v = c[0] & 0xfe (Script Validation); the low bit "is unused and must
 be 1", and Design adds "The parity bit of the control byte is always
 1, since P2MR does not have a key path spend". A footnote explains
@@ -15,23 +15,23 @@ instead of c[0] & 0xfe. Caveat: the validation steps never state
 explicit Fail clause. The footnote implies enforcement, so I take the
 strict reading: reject. See FINDINGS. Needs a negative test.
 
-Q2. Annex. Answered: identical to BIP 341. Script Validation: fail if
+Q2. Annex. Identical to BIP 341. Script Validation: fail if
 fewer than two witness elements; fail if exactly two and the last
 starts with 0x50; with three or more, a last element starting with
 0x50 is the annex -- removed from the stack, covered by the
 signature, contributes to weight, otherwise ignored.
 
-Q3. Tree hash tags. Answered: TapLeaf and TapBranch, both reused
+Q3. Tree hash tags. TapLeaf and TapBranch, both reused
 unchanged. k0 = hash_TapLeaf(v || compact_size(size of s) || s), then
 hash_TapBranch over each pair in lexicographic order -- the BIP 341
 construction verbatim (Design + Script Validation).
 
-Q4. Unknown leaf versions. Answered: unencumbered, as in taproot.
+Q4. Unknown leaf versions. Unencumbered, as in taproot.
 "This implies that for the future leaf versions (non-0xC0) the
 execution must succeed" (Script Validation); Backward Compatibility
 repeats that new leaf versions are the upgrade path.
 
-Q5. Depth 0. Answered: official since v0.12.0. Order matters: the
+Q5. Depth 0. Official since v0.12.0. Order matters: the
 merkle check q == r runs first, then "If m = 0, succeed immediately"
 -- execution is skipped. So a depth-0 spend still has to reveal the
 preimage, a script s whose TapLeaf hash equals the program.
@@ -41,13 +41,13 @@ mempool. Smallest protected tree is 2 leaves; our RPCs must refuse to
 build depth-0 outputs. Functional test case 3 builds the witness
 accordingly: revealed script + 1-byte control block.
 
-Q6. Signature message. Answered: "exactly the same procedure as
+Q6. Signature message. Per the spec, "exactly the same procedure as
 defined in BIP342 Common Signature Message" (own section). So
 SignatureHashSchnorr() as-is: tapscript extension with tapleaf_hash,
 key_version 0, codesep_pos; spend_type = 2*ext_flag + annex_present.
 Zero new sighash code. Stage 2 vectors are the proof.
 
-Q7. Standardness / policy. Answered: the spec is silent for upgraded
+Q7. Standardness / policy. The spec is silent for upgraded
 nodes. The only related text is Compatibility with BIP 141: old nodes
 treat v2 as anyone-can-spend and "generally will not relay or mine
 such transactions" (Core's DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM
@@ -77,7 +77,7 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   that must never drift) or exposing a base-size integer parameter
   (any value would typecheck), the implementation keeps one private
   helper and exposes two named entry points, ComputeTaprootMerkleRoot
-  and ComputeP2MRMerkleRoot. The public API only admits the two valid
+  and ComputeP2MRMerkleRoot. The public API only offers the two valid
   control block shapes.
 - Policy mirrors taproot for v2 spends in IsWitnessStandard(): annex
   is non-standard, tapscript initial stack items capped at 80 bytes.
