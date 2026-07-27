@@ -71,6 +71,20 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
 
 ## Implementation notes (stage 1)
 
+- Merkle root computation is shared with taproot by design of the BIP
+  itself (same TapLeaf/TapBranch tags, same ordering). Rather than
+  duplicating the ~10-line path walk (two copies of consensus code
+  that must never drift) or exposing a base-size integer parameter
+  (any value would typecheck), the implementation keeps one private
+  helper and exposes two named entry points, ComputeTaprootMerkleRoot
+  and ComputeP2MRMerkleRoot. The public API only admits the two valid
+  control block shapes.
+- Policy mirrors taproot for v2 spends in IsWitnessStandard(): annex
+  is non-standard, tapscript initial stack items capped at 80 bytes.
+  Without this, P2MR spends would have had no standardness limits at
+  all -- the flag being in the mandatory set removes the
+  "discouraged upgradable witness program" barrier.
+
 - The consensus delta is not limited to VerifyWitnessProgram():
   PrecomputedTransactionData::Init() decides whether to precompute the
   BIP 341 sighash midstate by pattern-matching spent outputs (34 bytes
