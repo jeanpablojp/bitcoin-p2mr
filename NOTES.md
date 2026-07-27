@@ -84,6 +84,23 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   Without this, P2MR spends would have had no standardness limits at
   all -- the flag being in the mandatory set removes the
   "discouraged upgradable witness program" barrier.
+- Flag scope: SCRIPT_VERIFY_P2MR sits in the mandatory policy flags
+  on every chain, while block validation only applies it on regtest.
+  On mainnet this fork's mempool would diverge from the network (it
+  would relay P2MR-shaped v2 spends that real consensus treats as
+  anyone-can-spend). I'm keeping it and documenting it instead of
+  coding around it: chain-dependent standard flags are not idiomatic
+  in Core, this fork must not run off regtest anyway, and there is no
+  ban/DoS vector -- block validation off regtest stays byte-identical
+  to vanilla.
+- Depth-0 policy is stricter than consensus on purpose: the stack
+  item size cap applies even though consensus skips execution at
+  m = 0. Stricter policy is safe, and depth-0 outputs are
+  anyone-can-spend anyway.
+- Known coverage gaps deferred to stage 4's feature_p2mr.py:
+  validation weight budget exhaustion, IsWitnessStandard() rules, and
+  an independent (Python) sighash check. The stage 2 vectors give the
+  construction side an implementation-independent oracle.
 
 - The consensus delta is not limited to VerifyWitnessProgram():
   PrecomputedTransactionData::Init() decides whether to precompute the

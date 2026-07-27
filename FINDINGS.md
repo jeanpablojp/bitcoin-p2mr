@@ -50,6 +50,19 @@ From inspecting the test vectors (pinned commit):
   anyone-can-spend under v0.12.0 -- worth a comment upstream asking
   whether the vector should carry a warning.
 
+## 2026-07-27, stage 1 closing review
+
+Went back over the whole stage before starting stage 2: re-checked
+every rule of the Script Validation section against the code, hunted
+for regressions to v0/v1/P2SH/anchor spends, and mutation-tested the
+unit suite (break the implementation on purpose, see which tests
+notice). Nothing diverges from the pinned spec, block validation off
+regtest stays byte-identical to vanilla, no memory-safety problems.
+The mutation run did expose four blind spots in the tests --
+max-depth path, P2SH-wrapped v2, non-32-byte v2 programs, empty
+control block -- covered now. The mempool flag scope question is
+written up in NOTES.md.
+
 ## Measurements
 
 Stage 4: witness weight and vsize, 2-leaf vs deeper trees, compared
