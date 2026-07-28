@@ -45,7 +45,7 @@ signature schemes as they become available.
 | 0 | vanilla build + spec reading | done |
 | 1 | consensus rules | done |
 | 2 | official test vectors | done |
-| 3 | address / solver | - |
+| 3 | address / solver | done |
 | 4 | RPC wallet + functional test | - |
 | 5 | write-up | - |
 

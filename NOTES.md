@@ -93,6 +93,16 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   in Core, this fork must not run off regtest anyway, and there is no
   ban/DoS vector -- block validation off regtest stays byte-identical
   to vanilla.
+  Stage 3 update: the solver now types v2/32 outputs, which drops the
+  old "witness program is undefined" input-standardness rejection.
+  That gate was what still kept this fork's mempool vanilla-ish off
+  regtest. From here the fork's mempool applies BIP 360 to v2/32
+  spends on every chain: valid ones relay, invalid ones are rejected
+  under the mandatory flag (a consensus-classified rejection of a
+  transaction mainnet consensus would accept). Needed for the stage 4
+  functional tests. Same trade-off and same reasoning as above, now
+  with one less safety net, so it bears repeating: this fork is for
+  regtest, full stop.
 - Depth-0 policy is stricter than consensus on purpose: the stack
   item size cap applies even though consensus skips execution at
   m = 0. Stricter policy is safe, and depth-0 outputs are
