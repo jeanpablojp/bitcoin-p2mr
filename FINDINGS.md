@@ -156,7 +156,7 @@ compact size prefix, while the P2MR one is 225 bytes and still fits in
 1, so the witness is 34 bytes smaller rather than 32. The BIP
 footnotes exactly this boundary for the P2MR side a few paragraphs
 earlier without carrying it into the comparison. Every other depth up
-to 128 gives 32. Not reported upstream yet.
+to 128 gives 32. Submitted as bitcoin/bips#2223 (2026-07-28).
 
 Not measured here, and worth stating plainly for the P2MR vs P2TRv2
 discussion: this compares script paths. A taproot key path spend is a

@@ -101,7 +101,10 @@ fine right up to the moment you verify a real signature.
   rejects an invalid spend inside a hand-built block, which is the
   point: these are consensus rules, not mempool policy.
 - Witness weight was measured against an equivalent taproot script
-  path spend; the numbers are in FINDINGS.md.
+  path spend; the numbers are in FINDINGS.md. Checking the BIP's
+  "always 32 bytes smaller" claim at every depth turned up an
+  exception at depth 7 (34 bytes, a compact size boundary), fixed in
+  [bitcoin/bips#2223](https://github.com/bitcoin/bips/pull/2223).
 
 ## Running it
 
