@@ -95,7 +95,52 @@ harness keeps documented exceptions for the two vector bugs that
 assert the divergence still reproduces at the pinned commit, so the
 upstream fix landing flips the test and tells us to drop them.
 
+## 2026-07-28, stage 4: RPCs and the functional test
+
+Two experimental RPCs (createp2mraddress, signp2mrspend) and
+feature_p2mr.py, which builds every witness in Python so the consensus
+code is checked against a second implementation of the BIP 341/342
+signature message. Review notes worth keeping:
+
+- The RPCs were reachable on every chain before I gated them. On
+  mainnet createp2mraddress would hand out a bc1z address that real
+  consensus treats as anyone-can-spend, so both RPCs now refuse to run
+  outside regtest and are registered as hidden, like the other
+  regtest-only RPCs.
+- signp2mrspend used to sign whatever script and control block it was
+  given. It now recomputes the Merkle root from them and checks it
+  against the output being spent, and refuses depth-zero control
+  blocks: signing one would suggest the signature protects something
+  when it protects nothing.
+- Unbounded input was a memory problem, not a theoretical one: a
+  400k-leaf request drove the node to 2.7 GB before the cap.
+- The Python tree in the test and the C++ tree in the RPC agree up to
+  four leaves and diverge for five or more. Neither is wrong (the BIP
+  commits to the root, not to a tree shape), and keeping them
+  independent is the point of the test, but above four leaves a
+  control block from one of them will not reconstruct the other's
+  root, so spends built by mixing the two fail.
+
 ## Measurements
 
-Stage 4: witness weight and vsize, 2-leaf vs deeper trees, compared
-with equivalent P2TR script-path spends.
+Measured by feature_p2mr.py on regtest: one input, one P2TR output
+(MiniWallet's address), SIGHASH_DEFAULT, a <key> OP_CHECKSIG leaf.
+Only the input side differs between the rows, so the deltas are the
+witness cost:
+
+| spend | control block | weight | vsize |
+|---|---|---|---|
+| P2MR, 2-leaf tree | 33 B | 513 | 129 |
+| P2MR, 4-leaf tree | 65 B | 545 | 137 |
+| P2TR script path, 2-leaf tree | 65 B | 545 | 137 |
+
+The 32-byte saving BIP 360 claims over an equivalent P2TR script path
+holds exactly: the control block carries no internal key. Put another
+way, a P2MR spend buys one extra level of tree for free relative to
+taproot, so the 4-leaf P2MR spend and the 2-leaf taproot spend cost
+the same 137 vB.
+
+Not measured here, and worth stating plainly for the P2MR vs P2TRv2
+discussion: this compares script paths. A taproot key path spend is a
+single 64-byte signature and remains much cheaper than any P2MR spend,
+which is the tradeoff the BIP makes for quantum resistance.

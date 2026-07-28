@@ -111,7 +111,12 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   validation weight budget exhaustion, IsWitnessStandard() rules, and
   an independent (Python) sighash check. The stage 2 vectors give the
   construction side an implementation-independent oracle.
-
+  Stage 4 closed the last two: the functional test builds every
+  witness from its own BIP 341/342 signature message, and covers the
+  80-byte stack item limit on both sides of the boundary. Budget
+  exhaustion is still untested; it needs a signature-heavy leaf and is
+  the one place where P2MR's smaller control block changes the
+  arithmetic against taproot.
 - The consensus delta is not limited to VerifyWitnessProgram():
   PrecomputedTransactionData::Init() decides whether to precompute the
   BIP 341 sighash midstate by pattern-matching spent outputs (34 bytes
@@ -126,6 +131,23 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   test_segwit_versions). Adapted them following the upstream v1
   precedent (33-byte program or skip). Expected collateral of any new
   witness version taking effect.
+
+## Implementation notes (stage 4)
+
+- The RPCs take a private key per call and store nothing. That side-
+  steps the key persistence question the plan left open, and suits a
+  tool whose only job is to exercise regtest.
+- createp2mraddress refuses single-leaf trees. Under BIP 360 a
+  depth-zero tree succeeds without executing anything, so an address
+  built from one leaf would be anyone-can-spend; signp2mrspend refuses
+  depth-zero control blocks for the same reason.
+- Leaves are wrapped as <key> OP_CHECKSIG when they are 32 bytes and
+  used as raw tapscript otherwise. Any leaf version other than 0xc0
+  has to be assembled by hand; the tool only builds tapscript leaves.
+- The functional test deliberately reimplements the script tree in
+  Python. It reproduces an official vector's Merkle root, scriptPubKey
+  and control blocks, which ties the spec, the Python model and the
+  consensus code together in one place.
 
 ## Build log (stage 0)
 

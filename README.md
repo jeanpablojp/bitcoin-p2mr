@@ -46,7 +46,7 @@ signature schemes as they become available.
 | 1 | consensus rules | done |
 | 2 | official test vectors | done |
 | 3 | address / solver | done |
-| 4 | RPC wallet + functional test | - |
+| 4 | RPC wallet + functional test | done |
 | 5 | write-up | - |
 
 ## Code
