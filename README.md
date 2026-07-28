@@ -49,7 +49,7 @@ signature schemes as they become available.
 | 2 | official test vectors | done |
 | 3 | address / solver | done |
 | 4 | RPC wallet + functional test | done |
-| 5 | write-up | in progress |
+| 5 | write-up | done |
 
 ## What is implemented
 
@@ -128,6 +128,11 @@ Two RPCs are available on regtest for building and spending P2MR
 outputs by hand: `createp2mraddress` and `signp2mrspend`. They are
 hidden RPCs and refuse to run on any other chain, because a witness v2
 output is anyone-can-spend everywhere BIP 360 is not active.
+
+## Write-up
+
+Posted on Delving Bitcoin (2026-07-28):
+https://delvingbitcoin.org/t/bip-360-p2mr-implemented-in-bitcoin-core-on-regtest-vector-results-measurements-spec-feedback/2751
 
 ## Code
 

@@ -131,6 +131,17 @@ round-trip test, which is there to check the RPCs themselves). Review notes wort
   reconstruct the other's root, so spends built by mixing the two
   fail.
 
+## 2026-07-28, stage 5: write-up posted
+
+The write-up went up on Delving Bitcoin (Protocol Design,
+tags taproot / post-quantum):
+https://delvingbitcoin.org/t/bip-360-p2mr-implemented-in-bitcoin-core-on-regtest-vector-results-measurements-spec-feedback/2751
+
+It carries the two spec questions that needed discussion rather than a
+PR (the control byte low bit's missing Fail clause, the single-leaf
+vector warning) and offers spend-path vectors upstream. Follow-up asks
+land here as they get answers.
+
 ## Measurements
 
 Measured by feature_p2mr.py on regtest: one input, one P2TR output
