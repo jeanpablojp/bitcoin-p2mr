@@ -15,7 +15,9 @@ is the project journal: plan, spec questions, findings, and results.
 In one line: BIP 360 (Pay-to-Merkle-Root / P2MR) consensus rules
 implemented in Bitcoin Core, checked against the official test
 vectors. Regtest only: BIP 360 is a draft and has no activation
-parameters.
+parameters, so block validation applies the rules on regtest and
+nowhere else. Note that the mempool side is not chain-gated; the
+trade-off is written up in NOTES.md.
 
 Independent, educational implementation. Not affiliated with Bitcoin
 Core or the BIP 360 authors. Not for mainnet use.
@@ -47,7 +49,72 @@ signature schemes as they become available.
 | 2 | official test vectors | done |
 | 3 | address / solver | done |
 | 4 | RPC wallet + functional test | done |
-| 5 | write-up | - |
+| 5 | write-up | in progress |
+
+## What is implemented
+
+Nine commits on top of Bitcoin Core master, all of them prefixed
+`p2mr:`. Roughly:
+
+| part | lines |
+|---|---|
+| consensus (script interpreter, error codes) | ~96 |
+| policy and block script flags | ~33 |
+| address recognition (solver, key_io, RPC surfaces) | ~59 |
+| experimental regtest RPCs | 329 |
+| unit tests | ~540 |
+| functional test | 492 |
+
+The consensus change is small because BIP 360 is deliberately taproot
+with the key path removed: the witness v2 branch reuses the existing
+tapscript execution, the BIP 342 signature message and the Merkle path
+walk. What differs, following the four changes the BIP lists itself:
+the witness program is compared against the computed root with no key
+tweak, the control block is 1 + 32*m bytes instead of 33 + 32*m,
+depth-zero trees succeed without executing anything, and there is no
+key path (so a two-element witness ending in an annex, which taproot
+accepts, is invalid here). The low bit of the control byte must be
+set, which needs its own error code.
+
+One thing that surprised me and is worth repeating to anyone
+implementing this: patching the interpreter is not enough.
+`PrecomputedTransactionData::Init()` decides whether to precompute the
+BIP 341 sighash midstate by pattern-matching spent outputs, and it
+does not recognise witness v2. Until that is fixed, everything looks
+fine right up to the moment you verify a real signature.
+
+## Results
+
+- All nine vectors in the official `p2mr_construction.json` are
+  satisfied: the seven construction cases match byte for byte (leaf
+  hashes, Merkle root, scriptPubKey, bech32m address, control blocks),
+  each control block is walked back to the root through the consensus
+  code. The remaining two are error vectors: the harness checks they
+  declare an error and skips them, since there is nothing to build.
+- Three vectors in `p2mr_pqc_construction.json` carry two bugs
+  between them. Fix submitted as
+  [bitcoin/bips#2220](https://github.com/bitcoin/bips/pull/2220).
+  Documentation problems (dead links, a stale version header, a
+  mislabelled size example) went in
+  [bitcoin/bips#2221](https://github.com/bitcoin/bips/pull/2221).
+- The functional test spends P2MR outputs end to end on regtest and
+  rejects an invalid spend inside a hand-built block, which is the
+  point: these are consensus rules, not mempool policy.
+- Witness weight was measured against an equivalent taproot script
+  path spend; the numbers are in FINDINGS.md.
+
+## Running it
+
+```
+cmake -B build && cmake --build build -j 8
+ctest --test-dir build                       # includes the vector tests
+build/test/functional/feature_p2mr.py        # end-to-end on regtest
+```
+
+Two RPCs are available on regtest for building and spending P2MR
+outputs by hand: `createp2mraddress` and `signp2mrspend`. They are
+hidden RPCs and refuse to run on any other chain, because a witness v2
+output is anyone-can-spend everywhere BIP 360 is not active.
 
 ## Code
 

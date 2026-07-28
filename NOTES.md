@@ -15,7 +15,8 @@ instead of c[0] & 0xfe. Caveat: the validation steps never state
 explicit Fail clause. The footnote implies enforcement, so I take the
 strict reading: reject. See FINDINGS. Needs a negative test.
 
-Q2. Annex. Identical to BIP 341. Script Validation: fail if
+Q2. Annex. The semantics are BIP 341's, the stack-count rule is not.
+Script Validation: fail if
 fewer than two witness elements; fail if exactly two and the last
 starts with 0x50; with three or more, a last element starting with
 0x50 is the annex -- removed from the stack, covered by the
@@ -45,7 +46,10 @@ Q6. Signature message. Per the spec, "exactly the same procedure as
 defined in BIP342 Common Signature Message" (own section). So
 SignatureHashSchnorr() as-is: tapscript extension with tapleaf_hash,
 key_version 0, codesep_pos; spend_type = 2*ext_flag + annex_present.
-Zero new sighash code. Stage 2 vectors are the proof.
+Zero new sighash code: the diff touches none. The proof that the
+message is right is the functional test, which recomputes it in Python
+and produces signatures the interpreter accepts; the stage 2 vectors
+are construction-only and say nothing about signatures.
 
 Q7. Standardness / policy. The spec is silent for upgraded
 nodes. The only related text is Compatibility with BIP 141: old nodes
@@ -56,7 +60,8 @@ behavior). Policy for P2MR-aware nodes is our call: start with
 
 Q8. Vectors. bip-0360/ref-impl/common/tests/data/, files
 p2mr_construction.json (9 vectors) and p2mr_pqc_construction.json
-(7 vectors); lowercase on disk, the BIP links them with uppercase (see
+(7 vectors); lowercase on disk, and the BIP links the first one with
+an uppercase name that 404s (the second it never links at all, see
 FINDINGS). Ref-impl is python/p2mr.py since PR #2202; the rust/js ones
 were moved out of the bips repo. Pinned commit above.
 
@@ -64,7 +69,8 @@ Layout: {version: 1, test_vectors: [...]}. Each vector has id,
 objective, given.scriptTree (nested tree; leaves carry script/asm/
 leafVersion), intermediary.leafHashes + merkleRoot, and either
 expected.{scriptPubKey, bip350Address, scriptPathControlBlocks} or
-expected.error. Control blocks confirm the Q1 rule (leaf 0xc0 shows up
+expected.error (one vector carries a scriptPubKey alongside its
+error). Control blocks confirm the Q1 rule (leaf 0xc0 shows up
 as 0xc1). They are construction-only vectors: no spending
 transactions or signatures, unlike BIP 341's script-path spend
 vectors. Spend-path testing is entirely on us (see FINDINGS).
@@ -129,14 +135,16 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
 - Two vanilla functional tests assumed v2/32-byte programs are
   unencumbered (feature_taproot "applic" cases, p2p_segwit
   test_segwit_versions). Adapted them following the upstream v1
-  precedent (33-byte program or skip). Expected collateral of any new
+  precedent (33-byte program or skip); rpc_blockchain needed the new
+  flag added to its expected script_flags list too. Expected collateral of any new
   witness version taking effect.
 
 ## Implementation notes (stage 4)
 
-- The RPCs take a private key per call and store nothing. That side-
-  steps the key persistence question the plan left open, and suits a
-  tool whose only job is to exercise regtest.
+- signp2mrspend takes a private key per call and stores nothing
+  (createp2mraddress never sees one: it only takes public keys or raw
+  scripts). That side-steps the key persistence question the plan left
+  open, and suits a tool whose only job is to exercise regtest.
 - createp2mraddress refuses single-leaf trees. Under BIP 360 a
   depth-zero tree succeeds without executing anything, so an address
   built from one leaf would be anyone-can-spend; signp2mrspend refuses
