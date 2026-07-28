@@ -68,7 +68,7 @@ Nine commits on top of Bitcoin Core master, all of them prefixed
 The consensus change is small because BIP 360 is deliberately taproot
 with the key path removed: the witness v2 branch reuses the existing
 tapscript execution, the BIP 342 signature message and the Merkle path
-walk. What differs, following the four changes the BIP lists itself:
+walk. What differs:
 the witness program is compared against the computed root with no key
 tweak, the control block is 1 + 32*m bytes instead of 33 + 32*m,
 depth-zero trees succeed without executing anything, and there is no
@@ -90,12 +90,14 @@ fine right up to the moment you verify a real signature.
   hashes, Merkle root, scriptPubKey, bech32m address, control blocks),
   each control block is walked back to the root through the consensus
   code. The remaining two are error vectors: the harness checks they
-  declare an error and skips them, since there is nothing to build.
+  declare an error and skips them (one of the two also publishes a
+  scriptPubKey alongside its error, which the harness deliberately
+  ignores).
 - Three vectors in `p2mr_pqc_construction.json` carry two bugs
   between them. Fix submitted as
   [bitcoin/bips#2220](https://github.com/bitcoin/bips/pull/2220).
   Documentation problems (dead links, a stale version header, a
-  mislabelled size example) went in
+  mislabelled size example) were submitted as
   [bitcoin/bips#2221](https://github.com/bitcoin/bips/pull/2221).
 - The functional test spends P2MR outputs end to end on regtest and
   rejects an invalid spend inside a hand-built block, which is the
@@ -103,16 +105,24 @@ fine right up to the moment you verify a real signature.
 - Witness weight was measured against an equivalent taproot script
   path spend; the numbers are in FINDINGS.md. Checking the BIP's
   "always 32 bytes smaller" claim at every depth turned up an
-  exception at depth 7 (34 bytes, a compact size boundary), fixed in
+  exception at depth 7 (34 bytes, a compact size boundary); fix
+  submitted as
   [bitcoin/bips#2223](https://github.com/bitcoin/bips/pull/2223).
 
 ## Running it
 
+The code is in the fork, not in this repository:
+
 ```
+git clone -b p2mr-regtest https://github.com/jeanpablojp/bitcoin.git
+cd bitcoin
 cmake -B build && cmake --build build -j 8
 ctest --test-dir build                       # includes the vector tests
 build/test/functional/feature_p2mr.py        # end-to-end on regtest
 ```
+
+The official vector JSONs are vendored into the fork at the pinned
+spec commit, so the vector tests run from a plain build.
 
 Two RPCs are available on regtest for building and spending P2MR
 outputs by hand: `createp2mraddress` and `signp2mrspend`. They are
@@ -127,7 +137,8 @@ https://github.com/jeanpablojp/bitcoin/tree/p2mr-regtest
 
 NOTES.md -- spec questions and answers, build log.
 FINDINGS.md -- ambiguities, vector results, measurements.
-FUTURE.md -- what I'm deliberately not doing.
+FUTURE.md -- follow-ups: out-of-scope work, plus two in-scope gaps
+left undone.
 
 ## Spec version
 

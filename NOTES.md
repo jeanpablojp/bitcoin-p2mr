@@ -13,7 +13,9 @@ why: it catches implementations that read the leaf version as c[0]
 instead of c[0] & 0xfe. Caveat: the validation steps never state
 "Fail if the low bit is 0" -- every other rule in that section has an
 explicit Fail clause. The footnote implies enforcement, so I take the
-strict reading: reject. See FINDINGS. Needs a negative test.
+strict reading: reject. See FINDINGS. Stage 1 update: the negative
+test exists (script_tests.cpp, "Control byte with the low bit
+unset").
 
 Q2. Annex. The semantics are BIP 341's, the stack-count rule is not.
 Script Validation: fail if
@@ -56,7 +58,9 @@ nodes. The only related text is Compatibility with BIP 141: old nodes
 treat v2 as anyone-can-spend and "generally will not relay or mine
 such transactions" (Core's DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM
 behavior). Policy for P2MR-aware nodes is our call: start with
--acceptnonstdtxn=1, tighten at the end of stage 1.
+-acceptnonstdtxn=1, tighten at the end of stage 1. Stage 1 update:
+superseded -- policy now mirrors taproot in IsWitnessStandard(), see
+the implementation notes below.
 
 Q8. Vectors. bip-0360/ref-impl/common/tests/data/, files
 p2mr_construction.json (9 vectors) and p2mr_pqc_construction.json
@@ -118,7 +122,8 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   an independent (Python) sighash check. The stage 2 vectors give the
   construction side an implementation-independent oracle.
   Stage 4 closed the last two: the functional test builds every
-  witness from its own BIP 341/342 signature message, and covers the
+  witness (except the RPC round-trip case, which exists to test the
+  RPCs) from its own BIP 341/342 signature message, and covers the
   80-byte stack item limit on both sides of the boundary. Budget
   exhaustion is still untested; it needs a signature-heavy leaf and is
   the one place where P2MR's smaller control block changes the

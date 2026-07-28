@@ -1,7 +1,7 @@
 # FUTURE
 
-Not part of BIP 360, so not part of this project. Possible follow-ups,
-roughly in order of interest:
+Possible follow-ups, roughly in order of interest. The first six are
+not part of BIP 360, so not part of this project:
 
 1. Post-quantum signature opcodes (e.g. OP_CHECKSIG_MLDSA via
    OP_SUCCESSx). This is the companion BIP that BIP 361 lists as TBD;

@@ -6,8 +6,8 @@ an issue on bitcoin/bips with a minimal reproduction.
 ## 2026-07-27
 
 - bip-0360.mediawiki header says Version: 0.12.0 but the top changelog
-  entry is 0.12.1 (2026-07-24). Report upstream once stage 0 confirms
-  nothing else is off.
+  entry is 0.12.1 (2026-07-24). Reported in bitcoin/bips#2221 during
+  stage 2.
 - The BIP links P2MR_construction.json; the file on disk is
   p2mr_construction.json. Trivial fix upstream. (The pqc vector file
   is never linked from the BIP at all.)
@@ -26,8 +26,9 @@ Found during the full spec read, same day:
   must be 1" but never adds an explicit "Fail if" step, unlike every
   other rule in that section. The footnote implies enforcement (it
   describes the bit catching deserialization bugs "with an immediate
-  error"). I implement the strict reading -- reject low bit 0 -- and
-  will ask upstream to make the Fail clause explicit.
+  error"). I implement the strict reading -- reject low bit 0. This
+  needs discussion rather than a one-line PR, so it goes in the stage
+  5 write-up instead of a bips PR.
 - The Test Vectors section still links the rust implementation that
   changelog 0.12.1 says was removed (moved to
   jbride/libbitcoinpqc-bindings). Dead link now.
@@ -48,8 +49,8 @@ From inspecting the test vectors (pinned commit):
   given.scriptTree (camelCase). A strict parser trips on this.
 - p2mr_single_leaf_script_tree builds a depth-0 output (merkle root ==
   leaf hash). Valid as construction, but spending it is
-  anyone-can-spend under v0.12.0 -- worth a comment upstream asking
-  whether the vector should carry a warning.
+  anyone-can-spend under v0.12.0 -- worth asking whether the vector
+  should carry a warning; raised in the stage 5 write-up.
 
 ## 2026-07-27, stage 1 closing review
 
@@ -73,8 +74,8 @@ Result: the seven construction vectors in p2mr_construction.json match
 every published field (leaf hashes, merkle root, scriptPubKey, bc1z
 address, control blocks), and each control block is walked back to the
 root through ComputeP2MRMerkleRoot. The other two vectors in that file
-only declare an error, so the harness checks the declaration and moves
-on. The pqc file has two real bugs, confirmed with an independent
+declare an error (one also carries a scriptPubKey), so the harness
+checks the declaration and moves on. The pqc file has two real bugs, confirmed with an independent
 Python recomputation straight from the spec formulas:
 
 - p2mr_pqc_construction.json, p2mr_three_leaf_complex and
