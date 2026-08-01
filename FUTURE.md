@@ -14,12 +14,12 @@ not part of BIP 360, so not part of this project:
 6. Activation logic. The draft defines no parameters, so there is
    nothing to implement.
 
-Two smaller ones that came out of building this, both inside the
-project's scope but left undone:
+One smaller one that came out of building this, inside the project's
+scope but left undone:
 
 7. Spend-path test vectors for BIP 360. The official vectors only
    cover construction, so every implementer writes their own spending
    coverage. Contributing vectors upstream would fix that once.
-8. A validation weight budget test. It is the one place where P2MR's
-   smaller control block changes the BIP 342 arithmetic against
-   taproot, and nothing exercises it yet.
+
+Done since: the validation weight budget test, which was item 8 here.
+See FINDINGS.

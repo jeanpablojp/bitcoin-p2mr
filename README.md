@@ -53,7 +53,7 @@ signature schemes as they become available.
 
 ## What is implemented
 
-Nine commits on top of Bitcoin Core master, all of them prefixed
+Ten commits on top of Bitcoin Core master, all of them prefixed
 `p2mr:`. Roughly:
 
 | part | lines |
@@ -63,7 +63,7 @@ Nine commits on top of Bitcoin Core master, all of them prefixed
 | address recognition (solver, key_io, RPC surfaces) | ~59 |
 | experimental regtest RPCs | 329 |
 | unit tests | ~540 |
-| functional test | 492 |
+| functional test | 546 |
 
 The consensus change is small because BIP 360 is deliberately taproot
 with the key path removed: the witness v2 branch reuses the existing

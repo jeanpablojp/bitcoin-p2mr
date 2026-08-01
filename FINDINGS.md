@@ -142,6 +142,29 @@ PR (the control byte low bit's missing Fail clause, the single-leaf
 vector warning) and offers spend-path vectors upstream. Follow-up asks
 land here as they get answers.
 
+## 2026-07-31: the validation weight budget
+
+Closed the last coverage gap from stage 4. The BIP 342 budget is the
+serialized witness size plus 50, and each signature check that passes
+costs 50, so a P2MR spend starts with exactly 32 less budget than the
+equivalent taproot script path: the same 32 bytes it saves by not
+carrying an internal key. Everywhere else the smaller control block is
+a saving; here it is a cost.
+
+The boundary is one check wide and the test pins it from both sides. A
+leaf that checks the same signature four times (OP_2DUP
+OP_CHECKSIGVERIFY three times, then OP_CHECKSIG, so 2 script bytes per
+extra check against 50 of budget) is rejected at block level as P2MR,
+with "Too much signature validation relative to witness weight", and
+accepted as a P2TR script path with the same leaf and the same tree
+depth. Three checks fit on both sides.
+
+Worth stating plainly in any comparison of the two output types: P2MR
+is 32 bytes cheaper per spend, and 32 bytes poorer in validation
+budget. For ordinary single-signature leaves this never binds, but it
+will matter for signature-heavy leaves, which is exactly what
+post-quantum schemes produce.
+
 ## Measurements
 
 Measured by feature_p2mr.py on regtest: one input, one P2TR output

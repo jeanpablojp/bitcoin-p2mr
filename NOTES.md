@@ -124,10 +124,9 @@ vectors. Spend-path testing is entirely on us (see FINDINGS).
   Stage 4 closed the last two: the functional test builds every
   witness (except the RPC round-trip case, which exists to test the
   RPCs) from its own BIP 341/342 signature message, and covers the
-  80-byte stack item limit on both sides of the boundary. Budget
-  exhaustion is still untested; it needs a signature-heavy leaf and is
-  the one place where P2MR's smaller control block changes the
-  arithmetic against taproot.
+  80-byte stack item limit on both sides of the boundary. Post
+  write-up update (2026-07-31): budget exhaustion is covered too, see
+  FINDINGS.
 - The consensus delta is not limited to VerifyWitnessProgram():
   PrecomputedTransactionData::Init() decides whether to precompute the
   BIP 341 sighash midstate by pattern-matching spent outputs (34 bytes
