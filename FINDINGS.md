@@ -189,6 +189,47 @@ touches vector data, so the pin does not need to wait for them. The
 header/changelog version mismatch (0.12.0 vs 0.12.1) still exists at
 the new pin, as #2221 is what fixes it.
 
+## 2026-08-01: spend-path vectors
+
+Item 7 of FUTURE, the last one. p2mr_spending.json is generated
+deterministically (keys and prevouts derived from labels, BIP 340
+signing with zero aux) by test/functional/tool_p2mr_spend_vectors.py
+and verified in src/test/p2mr_vector_tests.cpp by re-deriving root,
+scriptPubKey, leaf hash and control block from each published tree and
+running every witness through VerifyScript: six valid inputs in one
+transaction (depth-1 SIGHASH_DEFAULT, depth-2 SIGHASH_ALL, annex,
+depth-0 with no signature, unknown leaf version 0xfa, and a depth-128
+leaf whose control block is exactly the 4097-byte maximum) and nine
+invalid single-input transactions (bad signature, tampered path,
+control byte low bit 0, one-element witness, two elements ending in an
+annex, empty witness, and control blocks of 0, 34 and 1+32*129 bytes
+-- all three clauses of the size rule, with the depth limit pinned
+from both sides). The published error strings are what the harness
+maps onto script errors, so they are normative, not decoration. The
+schema mirrors BIP 341's wallet-test-vectors.json, including the
+sighash midstate pieces.
+
+Two design points worth recording:
+
+- The depth-0 and unknown-leaf-version cases reuse the trees published
+  in p2mr_construction.json, asserted byte-identical, so the two files
+  cross-check each other -- and the depth-0 spend demonstrates the
+  anyone-can-spend rule on the exact vector the write-up flagged.
+- p2mr_spend_control_byte_low_bit_zero takes the strict reading of the
+  control byte rule. Proposing it upstream forces the "Fail if" clause
+  question (raised in the write-up) to be answered either way: accept
+  the vector and the enforcement is canonical, or reject it and the
+  footnote needs rewording.
+
+Submitted upstream the same day: bitcoin/bips#2232 adds the file
+(byte-identical copy, checksum-verified) under
+bip-0360/ref-impl/common/tests/data/, branch bip360-spend-vectors on
+the bips fork. Delving updated on both ends: reply #33 on thread 1811
+(answering the #32 offer) and post #2 on the write-up thread 2751,
+which also records the #2220 merge and the re-pin. That closes the
+"offered publicly, then delivered" loop for the vectors; what remains
+upstream is review on #2232, #2221 and #2223.
+
 ## Measurements
 
 Measured by feature_p2mr.py on regtest: one input, one P2TR output

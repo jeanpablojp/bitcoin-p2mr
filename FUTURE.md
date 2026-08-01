@@ -14,12 +14,6 @@ not part of BIP 360, so not part of this project:
 6. Activation logic. The draft defines no parameters, so there is
    nothing to implement.
 
-One smaller one that came out of building this, inside the project's
-scope but left undone:
-
-7. Spend-path test vectors for BIP 360. The official vectors only
-   cover construction, so every implementer writes their own spending
-   coverage. Contributing vectors upstream would fix that once.
-
-Done since: the validation weight budget test, which was item 8 here.
-See FINDINGS.
+Done since, both from the in-scope leftovers this file used to carry:
+the validation weight budget test (item 8) and the spend-path test
+vectors (item 7). See FINDINGS. Nothing in scope is left undone.
