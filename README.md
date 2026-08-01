@@ -115,8 +115,9 @@ fine right up to the moment you verify a real signature.
 - Spend-path test vectors (`p2mr_spending.json`), which the official
   suite lacks: six valid inputs in one transaction and nine invalid
   ones, generated deterministically and verified against the consensus
-  code through `VerifyScript`. Details in FINDINGS.md; to be offered
-  upstream.
+  code through `VerifyScript`. Details in FINDINGS.md; offered
+  upstream as
+  [bitcoin/bips#2232](https://github.com/bitcoin/bips/pull/2232).
 
 ## Running it
 
