@@ -165,6 +165,30 @@ budget. For ordinary single-signature leaves this never binds, but it
 will matter for signature-heavy leaves, which is exactly what
 post-quantum schemes produce.
 
+## 2026-08-01: bips#2220 merged, vectors re-pinned
+
+The pqc vector fix was merged upstream as bitcoin/bips commit
+b31410ca587cec1cfd880b6617cc6b7cb036e6d7. Between the old pin
+(0fdf6ffdbb) and the new one the only change under bip-0360/ is that
+file, and the diff is exactly the submitted fix: the two leafHashes
+swaps and the 0xc1 -> 0xfb control byte.
+
+Re-pinned as planned: both vendored copies of
+p2mr_pqc_construction.json (src/test/data/ and bip360/) replaced with
+the fixed file, the KnownVectorBug exceptions dropped from
+p2mr_vector_tests.cpp, and the pin comments updated to b31410c. The
+three previously-bugged vectors now pass as ordinary cases; the
+harness checks all 16 vectors with no exceptions (267 assertions),
+and feature_p2mr.py still passes. The tripwire worked as designed:
+the exceptions assert the divergence, so the rebuilt test would have
+flagged the fixed vectors if they had been dropped in without
+removing the exceptions first.
+
+bips#2221 (doc fixes) and #2223 (m=7 saving) remain open; neither
+touches vector data, so the pin does not need to wait for them. The
+header/changelog version mismatch (0.12.0 vs 0.12.1) still exists at
+the new pin, as #2221 is what fixes it.
+
 ## Measurements
 
 Measured by feature_p2mr.py on regtest: one input, one P2TR output

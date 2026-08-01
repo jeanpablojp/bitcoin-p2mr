@@ -93,9 +93,12 @@ fine right up to the moment you verify a real signature.
   declare an error and skips them (one of the two also publishes a
   scriptPubKey alongside its error, which the harness deliberately
   ignores).
-- Three vectors in `p2mr_pqc_construction.json` carry two bugs
+- Three vectors in `p2mr_pqc_construction.json` carried two bugs
   between them. Fix submitted as
-  [bitcoin/bips#2220](https://github.com/bitcoin/bips/pull/2220).
+  [bitcoin/bips#2220](https://github.com/bitcoin/bips/pull/2220) and
+  merged upstream on 2026-08-01; the vendored vectors were re-pinned
+  to the merge commit and the harness now passes all 16 vectors with
+  no documented exceptions.
   Documentation problems (dead links, a stale version header, a
   mislabelled size example) were submitted as
   [bitcoin/bips#2221](https://github.com/bitcoin/bips/pull/2221).
@@ -148,8 +151,10 @@ left undone.
 ## Spec version
 
 BIP 360 v0.12.x, bitcoin/bips commit
-0fdf6ffdbb394a73c80978ae647322ceda8b9337 (2026-07-24). The header
-still says 0.12.0 while the changelog is at 0.12.1 -- see FINDINGS.md.
+b31410ca587cec1cfd880b6617cc6b7cb036e6d7 (2026-08-01, the merge of
+bips#2220; originally implemented against 0fdf6ffdbb of 2026-07-24,
+re-pinned when the vector fix landed). The header still says 0.12.0
+while the changelog is at 0.12.1 -- see FINDINGS.md.
 
 ## License
 
