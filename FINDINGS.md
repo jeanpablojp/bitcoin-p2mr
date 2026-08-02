@@ -226,8 +226,7 @@ Submitted upstream the same day: bitcoin/bips#2232 adds the file
 bip-0360/ref-impl/common/tests/data/, branch bip360-spend-vectors on
 the bips fork. Delving updated on both ends: reply #33 on thread 1811
 (answering the #32 offer) and post #2 on the write-up thread 2751,
-which also records the #2220 merge and the re-pin. That closes the
-"offered publicly, then delivered" loop for the vectors; what remains
+which also records the #2220 merge and the re-pin. What remains
 upstream is review on #2232, #2221 and #2223.
 
 ## Measurements
