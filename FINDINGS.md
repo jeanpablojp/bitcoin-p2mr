@@ -229,6 +229,19 @@ the bips fork. Delving updated on both ends: reply #33 on thread 1811
 which also records the #2220 merge and the re-pin. What remains
 upstream is review on #2232, #2221 and #2223.
 
+## 2026-08-03: bips#2221 and #2223 merged
+
+Both documentation fixes landed upstream: #2221 (dead links, version
+header, "(empty)" label) on 2026-08-02 and #2223 (the m = 7 exception
+to the "always 32 bytes smaller" claim) on 2026-08-03. Both touch
+only bip-0360.mediawiki, not the vector files, so no re-pin is needed:
+the vendored vectors and the b31410c pin stay as they are. The
+0.12.0/0.12.1 header discrepancy from the first day of FINDINGS is
+now fixed on master.
+
+Upstream tally: #2220, #2221 and #2223 merged; #2232 (spend-path
+vectors) in review.
+
 ## Measurements
 
 Measured by feature_p2mr.py on regtest: one input, one P2TR output
@@ -255,7 +268,8 @@ compact size prefix, while the P2MR one is 225 bytes and still fits in
 1, so the witness is 34 bytes smaller rather than 32. The BIP
 footnotes exactly this boundary for the P2MR side a few paragraphs
 earlier without carrying it into the comparison. Every other depth up
-to 128 gives 32. Submitted as bitcoin/bips#2223 (2026-07-28).
+to 128 gives 32. Submitted as bitcoin/bips#2223 (2026-07-28); merged
+2026-08-03.
 
 Not measured here, and worth stating plainly for the P2MR vs P2TRv2
 discussion: this compares script paths. A taproot key path spend is a
