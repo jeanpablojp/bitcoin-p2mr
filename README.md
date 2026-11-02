@@ -53,7 +53,7 @@ signature schemes as they become available.
 
 ## What is implemented
 
-Twelve commits on top of Bitcoin Core master, all of them prefixed
+Thirteen commits on top of Bitcoin Core master, all of them prefixed
 `p2mr:`. Roughly:
 
 | part | lines |
@@ -64,7 +64,7 @@ Twelve commits on top of Bitcoin Core master, all of them prefixed
 | experimental regtest RPCs | 329 |
 | unit tests | ~700 |
 | functional test | 546 |
-| spend-path vector generator | ~390 |
+| spend-path vector generator | ~460 |
 
 The consensus change is small because BIP 360 is deliberately taproot
 with the key path removed: the witness v2 branch reuses the existing
@@ -114,10 +114,10 @@ fine right up to the moment you verify a real signature.
   [bitcoin/bips#2223](https://github.com/bitcoin/bips/pull/2223),
   merged 2026-08-03.
 - Spend-path test vectors (`p2mr_spending.json`), which the official
-  suite lacks: six valid inputs in one transaction and nine invalid
-  ones, generated deterministically and verified against the consensus
-  code through `VerifyScript`. Details in FINDINGS.md; offered
-  upstream as
+  suite lacks: eleven valid inputs in two transactions that together
+  use all seven hash types, and ten invalid ones, generated
+  deterministically and verified against the consensus code through
+  `VerifyScript`. Details in FINDINGS.md; offered upstream as
   [bitcoin/bips#2232](https://github.com/bitcoin/bips/pull/2232).
 
 ## Running it
